@@ -8,6 +8,9 @@ defmodule Ssp.Application do
   def start(_type, _args) do
     # List all child processes to be supervised
     children = [
+      {Registry, keys: :unique, name: SessionRegistry},
+      OpenSessions,
+      SessionSupervisor,
       # Start the endpoint when the application starts
       SspWeb.Endpoint
       # Starts a worker by calling: Ssp.Worker.start_link(arg)
