@@ -1,6 +1,7 @@
 defmodule Session do
   use GenServer
 
+  # STARTUP
   @spec start_link([], [
           {:player1_name, String.t()} | {:player1_id, String.t()} | {:session_id, String.t()}
         ]) ::
@@ -24,6 +25,7 @@ defmodule Session do
      }}
   end
 
+  # CLIENT
   @spec join_game(String.t(), String.t(), String.t()) :: :ok
   def join_game(session_id, player2_id, player2_name) do
     GenServer.call(
@@ -32,14 +34,15 @@ defmodule Session do
     )
   end
 
-  @spec update_move(String.t(), Player.t(), :rock | :paper | :scissors) :: :ok
+  @spec update_move(String.t(), Player.t(), Move.move()) :: :ok
   def update_move(session_id, player, move) do
-    GenServer.cast(
+    GenServer.call(
       session_pid(session_id),
       {:update_move, player, move}
     )
   end
 
+  # SERVER
   @impl true
   def handle_call({:join_game, new_player = %Player{}}, _from, state) do
     if is_nil(state.player2) do
@@ -51,9 +54,19 @@ defmodule Session do
     end
   end
 
+  @impl true
+  def handle_call(
+        {:update_move, playing_player = %Player{}, move},
+        _from,
+        state = %{current_round: current_round}
+      ) do
+    {result, new_state} = Play.play(state, current_round, playing_player, move)
+
+    {:reply, result, new_state}
+  end
+
+  # HELPER
   defp session_pid(session_id) do
     {:via, Registry, {SessionRegistry, session_id}}
   end
-
-  # TODO: handle_cast(join_game, update_move)
 end
