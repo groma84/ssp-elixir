@@ -23,6 +23,7 @@ defmodule SspWeb do
 
       import Plug.Conn
       import SspWeb.Gettext
+      import Phoenix.LiveView.Controller
       alias SspWeb.Router.Helpers, as: Routes
     end
   end
@@ -41,6 +42,7 @@ defmodule SspWeb do
 
       import SspWeb.ErrorHelpers
       import SspWeb.Gettext
+      import Phoenix.LiveView.Helpers
       alias SspWeb.Router.Helpers, as: Routes
     end
   end
@@ -50,6 +52,7 @@ defmodule SspWeb do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
+      import Phoenix.LiveView.Router
     end
   end
 

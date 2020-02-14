@@ -4,7 +4,7 @@ defmodule SspWeb.Router do
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
-    plug :fetch_flash
+    plug Phoenix.LiveView.Flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
@@ -16,7 +16,7 @@ defmodule SspWeb.Router do
   scope "/", SspWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    get "/", LobbyController, :index
   end
 
   # Other scopes may use custom stacks.

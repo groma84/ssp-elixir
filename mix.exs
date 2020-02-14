@@ -32,7 +32,7 @@ defmodule Ssp.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.4.10"},
+      {:phoenix, "~> 1.4.0"},
       {:phoenix_pubsub, "~> 1.1"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
@@ -42,7 +42,9 @@ defmodule Ssp.MixProject do
       {:uuid, "~> 1.1"},
       {:typed_struct, "~> 0.1.4"},
       {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false},
-      {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false},
+      {:phoenix_live_view, "~> 0.7.0"},
+      {:floki, ">= 0.0.0", only: :test}
     ]
   end
 end

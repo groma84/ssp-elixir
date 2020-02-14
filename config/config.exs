@@ -12,7 +12,10 @@ config :ssp, SspWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "uFYHbEwOCqDiEEhN8crtOXkIMTmr+V8BPp/ymsQfq9m6SJS7N6Bop0u/5pboLl4G",
   render_errors: [view: SspWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Ssp.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: Ssp.PubSub, adapter: Phoenix.PubSub.PG2],
+  live_view: [
+    signing_salt: "+k9T0N11X99RcNN6RBV+BEq47299teDv"
+  ]
 
 # Configures Elixir's Logger
 config :logger, :console,
