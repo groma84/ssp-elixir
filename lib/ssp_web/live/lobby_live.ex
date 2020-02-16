@@ -6,7 +6,25 @@ defmodule SspWeb.LobbyLive do
   end
 
   def mount(_params, %{}, socket) do
-    temperature = 42
-    {:ok, assign(socket, :temperature, temperature)}
+    player_id = UUID.uuid4()
+
+    if connected?(socket) do
+      :timer.send_interval(30000, self(), :update)
+    end
+
+    {:ok,
+     assign(socket,
+       changeset: Player.changeset(%Player{}, %{player_id: player_id}),
+       valid: false,
+       open_games: []
+     )}
+  end
+
+  def handle_event("validate", %{"player" => %{"player_name" => player_name}}, socket) do
+    changeset = Player.changeset(socket.assigns.changeset, %{name: player_name})
+
+    IO.inspect(changeset)
+
+    {:noreply, assign(socket, changeset: changeset, valid: changeset.valid?)}
   end
 end

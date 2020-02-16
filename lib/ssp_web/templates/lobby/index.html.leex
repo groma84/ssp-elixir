@@ -1,1 +1,10 @@
-Current temperature: <%= @temperature %>
+<%= f = form_for @changeset, "#", [phx_change: :validate] %>
+  <%= text_input f, :player_name, placeholder: "Insert player name" %>
+</form>
+
+<%= if @valid do %>
+  <h3>open_games</h3>
+  <%= for open_game <- @open_games do %>
+    <p><%= open_game.name %>'s game</p>
+  <% end %>
+<% end %>

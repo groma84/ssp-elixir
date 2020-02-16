@@ -44,7 +44,9 @@ defmodule Ssp.MixProject do
       {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false},
       {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false},
       {:phoenix_live_view, "~> 0.7.0"},
-      {:floki, ">= 0.0.0", only: :test}
+      {:floki, ">= 0.0.0", only: :test},
+      {:ecto, ">= 0.0.0"},
+      {:phoenix_ecto, ">= 0.0.0"}
     ]
   end
 end
