@@ -15,11 +15,12 @@ defmodule SessionSupervisor do
     )
   end
 
-  @spec new_session(String.t(), String.t(), String.t()) ::
-          :ignore | {:error, any} | {:ok, pid} | {:ok, pid, any}
-  def new_session(session_id, player1_id, player1_name) do
+  @spec new_session(String.t(), String.t()) :: String.t()
+  def new_session(player1_id, player1_name) do
+    session_id = UUID.uuid4()
     OpenSessions.add(session_id)
     start_child(session_id, player1_id, player1_name)
+    session_id
   end
 
   def end_session(session_id) do

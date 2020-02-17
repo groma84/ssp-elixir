@@ -42,6 +42,13 @@ defmodule Session do
     )
   end
 
+  def get(session_id) do
+    GenServer.call(
+      session_pid(session_id),
+      {:get_data}
+    )
+  end
+
   # SERVER
   @impl true
   def handle_call({:join_game, new_player = %Player{}}, _from, state) do
@@ -63,6 +70,15 @@ defmodule Session do
     {result, new_state} = Play.play(state, current_round, playing_player, move)
 
     {:reply, result, new_state}
+  end
+
+  @impl true
+  def handle_call(
+        {:get_data},
+        _from,
+        state = %{session_id: session_id, player1: %Player{name: player1_name}}
+      ) do
+    {:reply, %{session_id: session_id, player1_name: player1_name}, state}
   end
 
   # HELPER

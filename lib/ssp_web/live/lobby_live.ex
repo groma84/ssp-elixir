@@ -16,7 +16,7 @@ defmodule SspWeb.LobbyLive do
      assign(socket,
        changeset: Player.changeset(%Player{}, %{player_id: player_id}),
        valid: false,
-       open_games: []
+       open_games: Lobby.list_open_session()
      )}
   end
 

@@ -17,6 +17,9 @@ defmodule SspWeb.Router do
     pipe_through :browser
 
     get "/", LobbyController, :index
+
+    get "/session/new/:player_id/:player_name", SessionController, :new
+    get "/session/join/:player_id/:player_name/:session_id", SessionController, :join
   end
 
   # Other scopes may use custom stacks.
