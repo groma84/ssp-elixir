@@ -1,50 +1,50 @@
-defmodule Session do
+defmodule Game do
   use GenServer
 
   # STARTUP
   @spec start_link([], [
-          {:player1_name, String.t()} | {:player1_id, String.t()} | {:session_id, String.t()}
+          {:player1_name, String.t()} | {:player1_id, String.t()} | {:game_id, String.t()}
         ]) ::
           :ignore | {:error, any} | {:ok, pid}
-  def start_link([], session_id: session_id, player1_id: player1_id, player1_name: player1_name) do
+  def start_link([], game_id: game_id, player1_id: player1_id, player1_name: player1_name) do
     GenServer.start_link(
       __MODULE__,
-      [session_id: session_id, player1_id: player1_id, player1_name: player1_name],
-      name: session_pid(session_id)
+      [game_id: game_id, player1_id: player1_id, player1_name: player1_name],
+      name: game_pid(game_id)
     )
   end
 
   @impl true
-  @spec init([{:session_id, String.t()} | {:player1_id, String.t()} | {:player1_name, String.t()}]) ::
-          {:ok, SessionData.t()}
-  def init(session_id: session_id, player1_id: player1_id, player1_name: player1_name) do
+  @spec init([{:game_id, String.t()} | {:player1_id, String.t()} | {:player1_name, String.t()}]) ::
+          {:ok, GameData.t()}
+  def init(game_id: game_id, player1_id: player1_id, player1_name: player1_name) do
     {:ok,
-     %SessionData{
-       session_id: session_id,
+     %GameData{
+       game_id: game_id,
        player1: %Player{name: player1_name, player_id: player1_id}
      }}
   end
 
   # CLIENT
   @spec join_game(String.t(), String.t(), String.t()) :: :ok
-  def join_game(session_id, player2_id, player2_name) do
+  def join_game(game_id, player2_id, player2_name) do
     GenServer.call(
-      session_pid(session_id),
+      game_pid(game_id),
       {:join_game, %Player{name: player2_name, player_id: player2_id}}
     )
   end
 
   @spec update_move(String.t(), Player.t(), Move.move()) :: :ok
-  def update_move(session_id, player, move) do
+  def update_move(game_id, player, move) do
     GenServer.call(
-      session_pid(session_id),
+      game_pid(game_id),
       {:update_move, player, move}
     )
   end
 
-  def get(session_id) do
+  def get(game_id) do
     GenServer.call(
-      session_pid(session_id),
+      game_pid(game_id),
       {:get_data}
     )
   end
@@ -53,7 +53,7 @@ defmodule Session do
   @impl true
   def handle_call({:join_game, new_player = %Player{}}, _from, state) do
     if is_nil(state.player2) do
-      OpenSessions.remove(state.session_id)
+      OpenGames.remove(state.game_id)
       new_state = %{state | player2: new_player}
       {:reply, :ok, new_state}
     else
@@ -76,13 +76,13 @@ defmodule Session do
   def handle_call(
         {:get_data},
         _from,
-        state = %{session_id: session_id, player1: %Player{name: player1_name}}
+        state
       ) do
-    {:reply, %{session_id: session_id, player1_name: player1_name}, state}
+    {:reply, state, state}
   end
 
   # HELPER
-  defp session_pid(session_id) do
-    {:via, Registry, {SessionRegistry, session_id}}
+  defp game_pid(game_id) do
+    {:via, Registry, {GameRegistry, game_id}}
   end
 end

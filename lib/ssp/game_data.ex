@@ -1,8 +1,8 @@
-defmodule SessionData do
+defmodule GameData do
   use TypedStruct
 
   typedstruct do
-    field(:session_id, :string, enforce: true)
+    field(:game_id, :string, enforce: true)
     field(:player1, Player.t(), enforce: true)
     field(:player2, Player.t())
     field(:current_round, Round.t(), default: %Round{})

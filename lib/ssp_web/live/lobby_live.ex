@@ -8,15 +8,12 @@ defmodule SspWeb.LobbyLive do
   def mount(_params, %{}, socket) do
     player_id = UUID.uuid4()
 
-    if connected?(socket) do
-      :timer.send_interval(30000, self(), :update)
-    end
-
     {:ok,
-     assign(socket,
+     assign(
+       socket,
        changeset: Player.changeset(%Player{}, %{player_id: player_id}),
        valid: false,
-       open_games: Lobby.list_open_session()
+       open_games: Lobby.list_open_games()
      )}
   end
 

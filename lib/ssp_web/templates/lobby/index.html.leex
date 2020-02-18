@@ -8,15 +8,17 @@
     <%= if Enum.empty?(@open_games) do %>
     <h3>No games running - why don't you start one?</h3>
     <% else %> 
+      <ul>
       <%= for open_game <- @open_games do %>
-        <a href="<%= Routes.session_path(SspWeb.Endpoint, :join, @changeset.changes.player_id, @changeset.changes.name, open_game.session_id) %>">Join <%= open_game.player1_name %>'s game</a>
+        <li><a href="<%= Routes.game_path(SspWeb.Endpoint, :join, @changeset.changes.player_id, @changeset.changes.name, open_game.game_id) %>">Join <%= open_game.player1_name %>'s game</a></li>
       <% end %>
+      </ul>
     <% end %>
   <% end %>
 </section>
 
 <section id="startNewGame">
   <%= if @valid do %>
-    <a href="<%= Routes.session_path(SspWeb.Endpoint, :new, @changeset.changes.player_id, @changeset.changes.name) %>">Start a new game</a>
+    <a href="<%= Routes.game_path(SspWeb.Endpoint, :new, @changeset.changes.player_id, @changeset.changes.name) %>">Start a new game</a>
   <% end %>
 </section>

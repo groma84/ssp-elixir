@@ -18,8 +18,9 @@ defmodule SspWeb.Router do
 
     get "/", LobbyController, :index
 
-    get "/session/new/:player_id/:player_name", SessionController, :new
-    get "/session/join/:player_id/:player_name/:session_id", SessionController, :join
+    get "/game/new/:player_id/:player_name", GameController, :new
+    get "/game/join/:player_id/:player_name/:game_id", GameController, :join
+    get "/game/play/:player_id/:game_id", GameController, :play
   end
 
   # Other scopes may use custom stacks.
