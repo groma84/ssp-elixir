@@ -6,13 +6,17 @@
     <button type="button" phx-click="end_game">Spiel beendet - zurück zur Lobby</button>
   </div>
 <% else %>
-  <div>
-    <button type="button" phx-value-move="scissors" phx-click="make_move">Schere</button>
-    <button type="button" phx-value-move="rock" phx-click="make_move">Stein</button>
-    <button type="button" phx-value-move="paper" phx-click="make_move">Papier</button><% end %>
-  <div>
-    <%= if !is_nil(@last_round) do %>
-      <h4>Letzte Runde: <%= @last_round.my_last_move %> : <%= @last_round.other_last_move %></h4>
-    <% end %>
+  <%= if @game_timed_out do %>
+    <button type="button" phx-click="end_game">Zu lange inaktiv - zurück zur Lobby</button>
+  <% else %>
+    <div>
+      <button type="button" phx-value-move="scissors" phx-click="make_move">Schere</button>
+      <button type="button" phx-value-move="rock" phx-click="make_move">Stein</button>
+      <button type="button" phx-value-move="paper" phx-click="make_move">Papier</button><% end %>
+    <div>
+      <%= if !is_nil(@last_round) do %>
+        <h4>Letzte Runde: <%= @last_round.my_last_move %> : <%= @last_round.other_last_move %></h4>
+      <% end %>
+    </div>
   </div>
-</div>
+<% end %>

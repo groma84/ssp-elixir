@@ -62,7 +62,8 @@ defmodule SspWeb.GameLive do
         game_id: game_data.game_id,
         someone_has_won: !is_nil(game_data.winner),
         last_round: format_last_round(game_data, player_id),
-        score: Play.calculate_score(game_data, player_id)
+        score: Play.calculate_score(game_data, player_id),
+        game_timed_out: game_data.timed_out
       },
       player_data
     )

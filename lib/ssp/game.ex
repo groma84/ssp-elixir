@@ -1,6 +1,8 @@
 defmodule Game do
   use GenServer
 
+  @inactivity_timeout 60000
+
   # STARTUP
   @spec start_link([], [
           {:player1_name, String.t()} | {:player1_id, String.t()} | {:game_id, String.t()}
@@ -58,9 +60,9 @@ defmodule Game do
       new_state = %{state | player2: new_player}
 
       publish_new_game_state(new_state)
-      {:reply, :ok, new_state}
+      {:reply, :ok, new_state, @inactivity_timeout}
     else
-      {:reply, :game_already_full, state}
+      {:reply, :game_already_full, state, @inactivity_timeout}
     end
   end
 
@@ -73,7 +75,7 @@ defmodule Game do
     {result, new_state} = Play.play(state, current_round, player_id, move)
 
     publish_new_game_state(new_state)
-    {:reply, result, new_state}
+    {:reply, result, new_state, @inactivity_timeout}
   end
 
   @impl true
@@ -82,7 +84,20 @@ defmodule Game do
         _from,
         state
       ) do
-    {:reply, state, state}
+    {:reply, state, state, @inactivity_timeout}
+  end
+
+  @impl true
+  def handle_info(:timeout, %{game_id: game_id} = game_state) do
+    IO.inspect("timeout")
+
+    Phoenix.PubSub.broadcast(
+      Ssp.PubSub,
+      game_id,
+      {:update_game_state, %{game_state | timed_out: true}}
+    )
+
+    GameSupervisor.end_game(game_id)
   end
 
   defp publish_new_game_state(new_game_state) do
