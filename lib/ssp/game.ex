@@ -34,11 +34,12 @@ defmodule Game do
     )
   end
 
-  @spec update_move(String.t(), Player.t(), Move.move()) :: :ok
-  def update_move(game_id, player, move) do
+  @spec update_move(String.t(), String.t(), Move.move()) ::
+          :moves_already_made | :waiting_for_other_player
+  def update_move(game_id, player_id, move) do
     GenServer.call(
       game_pid(game_id),
-      {:update_move, player, move}
+      {:update_move, player_id, move}
     )
   end
 
@@ -55,6 +56,8 @@ defmodule Game do
     if is_nil(state.player2) do
       OpenGames.remove(state.game_id)
       new_state = %{state | player2: new_player}
+
+      publish_new_game_state(new_state)
       {:reply, :ok, new_state}
     else
       {:reply, :game_already_full, state}
@@ -63,12 +66,13 @@ defmodule Game do
 
   @impl true
   def handle_call(
-        {:update_move, playing_player = %Player{}, move},
+        {:update_move, player_id, move},
         _from,
         state = %{current_round: current_round}
       ) do
-    {result, new_state} = Play.play(state, current_round, playing_player, move)
+    {result, new_state} = Play.play(state, current_round, player_id, move)
 
+    publish_new_game_state(new_state)
     {:reply, result, new_state}
   end
 
@@ -79,6 +83,16 @@ defmodule Game do
         state
       ) do
     {:reply, state, state}
+  end
+
+  defp publish_new_game_state(new_game_state) do
+    IO.inspect(new_game_state, label: "publish_new_game_state")
+
+    Phoenix.PubSub.broadcast(
+      Ssp.PubSub,
+      new_game_state.game_id,
+      {:update_game_state, new_game_state}
+    )
   end
 
   # HELPER

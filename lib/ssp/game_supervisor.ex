@@ -18,15 +18,20 @@ defmodule GameSupervisor do
   @spec new_game(String.t(), String.t()) :: String.t()
   def new_game(player1_id, player1_name) do
     game_id = UUID.uuid4()
-    OpenGames.add(game_id)
     start_child(game_id, player1_id, player1_name)
+    OpenGames.add(game_id)
     game_id
   end
 
   def end_game(game_id) do
-    [{pid, _}] = Registry.lookup(GameRegistry, game_id)
-    OpenGames.remove(game_id)
-    DynamicSupervisor.terminate_child(@me, pid)
+    case Registry.lookup(GameRegistry, game_id) do
+      [{pid, _}] ->
+        OpenGames.remove(game_id)
+        DynamicSupervisor.terminate_child(@me, pid)
+
+      [] ->
+        :ok
+    end
   end
 
   defp start_child(game_id, player1_id, player1_name) do

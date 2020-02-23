@@ -42,8 +42,8 @@ defmodule Ssp.MixProject do
       {:uuid, "~> 1.1"},
       {:typed_struct, "~> 0.1.4"},
       {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false},
-      {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false},
-      {:phoenix_live_view, "~> 0.7.0"},
+      {:credo, "~> 1.2.0", only: [:dev, :test], runtime: false},
+      {:phoenix_live_view, "~> 0.8.0"},
       {:floki, ">= 0.0.0", only: :test},
       {:ecto, ">= 0.0.0"},
       {:phoenix_ecto, ">= 0.0.0"}

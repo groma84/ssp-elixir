@@ -1,8 +1,18 @@
-<h1>GAME</h1>
-
-<div>game_id <%= @game_id %></div>
-<div>my_player_id <%= @my_player_id %></div>
-<div>my_player_name <%= @my_player_name %></div>
-<div>other_player_name <%= @other_player_name %></div>
-
-
+<div>
+  <h1>Schere Stein Papier</h1>
+  <h2><%= @my_player_name %> vs. <%= @other_player_name %></h2>
+  <h3><%= @score.own_wins %> : <%= @score.other_wins %></h3>
+  <%= if @someone_has_won do %>
+    <button type="button" phx-click="end_game">Spiel beendet - zurück zur Lobby</button>
+  </div>
+<% else %>
+  <div>
+    <button type="button" phx-value-move="scissors" phx-click="make_move">Schere</button>
+    <button type="button" phx-value-move="rock" phx-click="make_move">Stein</button>
+    <button type="button" phx-value-move="paper" phx-click="make_move">Papier</button><% end %>
+  <div>
+    <%= if !is_nil(@last_round) do %>
+      <h4>Letzte Runde: <%= @last_round.my_last_move %> : <%= @last_round.other_last_move %></h4>
+    <% end %>
+  </div>
+</div>

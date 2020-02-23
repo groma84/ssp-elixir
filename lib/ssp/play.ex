@@ -1,26 +1,51 @@
 defmodule Play do
-  def play(session_state, current_round, playing_player, move) do
-    if moves_already_made?(current_round) do
-      {:moves_already_made, session_state}
-    else
-      move_added =
-        case get_player(playing_player, session_state) do
-          :player1 -> %{current_round | player1_choice: move}
-          :player2 -> %{current_round | player2_choice: move}
-        end
+  def play(game_state, current_round, playing_player_id, move) do
+    cond do
+      moves_already_made?(current_round) ->
+        {:moves_already_made, game_state}
 
-      if moves_already_made?(move_added) do
-        updated_rounds = update_rounds(session_state, move_added)
+      somebody_has_won?(game_state) ->
+        {:game_already_won, game_state}
 
-        case check_for_winner(updated_rounds.past_decisive_rounds) do
-          :none -> {:continue_playing, updated_rounds}
-          :player1 -> {:game_over, %{updated_rounds | winner: session_state.player1}}
-          :player2 -> {:game_over, %{updated_rounds | winner: session_state.player2}}
+      true ->
+        move_added =
+          case get_player(playing_player_id, game_state) do
+            :player1 -> %{current_round | player1_choice: move}
+            :player2 -> %{current_round | player2_choice: move}
+          end
+
+        if moves_already_made?(move_added) do
+          updated_rounds = update_rounds(game_state, move_added)
+
+          case check_for_winner(updated_rounds.past_decisive_rounds) do
+            :none -> {:continue_playing, updated_rounds}
+            :player1 -> {:game_over, %{updated_rounds | winner: game_state.player1}}
+            :player2 -> {:game_over, %{updated_rounds | winner: game_state.player2}}
+          end
+        else
+          {:waiting_for_other_player, %{game_state | current_round: move_added}}
         end
-      else
-        {:waiting_for_other_player, %{session_state | current_round: move_added}}
-      end
     end
+  end
+
+  def calculate_score(state, player_id) do
+    current_player = get_player(player_id, state)
+
+    Enum.reduce(state.past_decisive_rounds, %{own_wins: 0, other_wins: 0}, fn round, acc ->
+      round_winner = evaluate_round(round.player1_choice, round.player2_choice)
+
+      if round_winner == current_player do
+        %{
+          own_wins: acc.own_wins + 1,
+          other_wins: acc.other_wins
+        }
+      else
+        %{
+          own_wins: acc.own_wins,
+          other_wins: acc.other_wins + 1
+        }
+      end
+    end)
   end
 
   @spec moves_already_made?(Round.t()) :: boolean()
@@ -28,7 +53,11 @@ defmodule Play do
     !(is_nil(round.player1_choice) || is_nil(round.player2_choice))
   end
 
-  defp get_player(%Player{player_id: playing_player_id}, state) do
+  defp somebody_has_won?(game_state) do
+    !is_nil(game_state.winner)
+  end
+
+  defp get_player(playing_player_id, state) do
     if playing_player_id == state.player1.player_id do
       :player1
     else
